@@ -1,0 +1,31 @@
+{
+  "name": "multer-ovh-objectstorage",
+  "version": "1.0.0",
+  "description": "multer storage engine for ovh object storage",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/antoinedray/multer-ovh-objectstorage.git"
+  },
+  "keywords": [
+    "multer",
+    "ovh",
+    "object",
+    "storage",
+    "storage",
+    "engine"
+  ],
+  "author": "Antoine Dray",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/antoinedray/multer-ovh-objectstorage/issues"
+  },
+  "homepage": "https://github.com/antoinedray/multer-ovh-objectstorage#readme",
+  "dependencies": {
+    "path": "^0.12.7",
+    "request": "^2.88.0"
+  }
+}
