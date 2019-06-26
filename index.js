@@ -1,3 +1,9 @@
+/*
+ *  File: index.js
+ *  Author: Antoine Dray
+ *  Description: Streaming multer storage engine for OVH Object Storage.
+ */
+
 const path = require('path');
 const request = require('request');
 
