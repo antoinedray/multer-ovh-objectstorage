@@ -51,22 +51,22 @@ function OVHObjectStorage(opts) {
 }
 
 function connect(opts) {
-    var json = {
-      auth: {
-        passwordCredentials: {
-          username: opts.username,
-          password: opts.password
-        },
-        tenantName: opts.tenantId,
-        tenantId: opts.tenantId
-      }
+    const json = {
+        auth: {
+            passwordCredentials: {
+                username: opts.username,
+                password: opts.password
+            },
+            tenantName: opts.tenantId,
+            tenantId: opts.tenantId
+        }
     };
     return new Promise((resolve, reject) => {
         request({
-          method: 'POST',
-          uri: opts.authURL + '/tokens',
-          json: json,
-          headers: { 'Accept': 'application/json' }
+            method: 'POST',
+            uri: opts.authURL + '/tokens',
+            json: json,
+            headers: { 'Accept': 'application/json' }
         }, function(err, res, body) {
             if (err)
                 throw err;
@@ -74,8 +74,10 @@ function connect(opts) {
                 throw new Error(body.error.message);
 
             const token = body.access.token;
-            const serviceCatalog = body.access.serviceCatalog.find(c => c.type === 'object-store');
-            const endpoint = serviceCatalog.endpoints.find(e => e.region === opts.region);
+            const catalog = body.access.serviceCatalog
+                                .find(c => c.type === 'object-store');
+            const endpoint = catalog.endpoints
+                                .find(e => e.region === opts.region);
 
             resolve({ token, endpoint });
         });
@@ -87,9 +89,10 @@ function formatTargetURL(publicURL, container, filename) {
     return baseURL + filename;
 }
 
-function create_filename(extname) {
+function create_filename(filename) {
+    const extention = path.extname(filename);
     const random = (Math.random() + 1).toString(36).substring(7);
-    return random + '-' + Date.now() + extname;
+    return random + '-' + Date.now() + extention;
 }
 
 OVHObjectStorage.prototype._handleFile = function(req, file, cb) {
@@ -99,8 +102,7 @@ OVHObjectStorage.prototype._handleFile = function(req, file, cb) {
         connect(opts).then((res) => {
 
             const publicURL = res.endpoint.publicURL;
-            const extname = path.extname(file.originalname);
-            const filename = create_filename(extname);
+            const filename = create_filename(file.originalname);
 
             const params = {
                 targetURL: formatTargetURL(publicURL, opts.container, filename),
@@ -127,10 +129,6 @@ OVHObjectStorage.prototype._handleFile = function(req, file, cb) {
 
         }).catch((err) => console.log(err));
     })
-}
-
-OVHObjectStorage.prototype._removeFile = function _removeFile(req, file, cb) {
-    fs.unlink(file.path, cb)
 }
 
 module.exports = function(opts) {
