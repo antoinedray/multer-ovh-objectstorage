@@ -69,9 +69,11 @@ function connect(opts) {
             headers: { 'Accept': 'application/json' }
         }, function(err, res, body) {
             if (err)
-                throw err;
+                return reject(err);
             if (body.error)
-                throw new Error(body.error.message);
+                return reject(new Error(body.error.message));
+            if (!body.access)
+                return reject(new Error('Connection response incomplete'));
 
             const token = body.access.token;
             const catalog = body.access.serviceCatalog
@@ -127,7 +129,7 @@ OVHObjectStorage.prototype._handleFile = function(req, file, cb) {
                 })
             );
 
-        }).catch((err) => console.log(err));
+        }).catch(err => { return cb(err) });
     })
 }
 

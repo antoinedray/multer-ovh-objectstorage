@@ -33,7 +33,7 @@ app.post('/upload', upload.single('file'), function(req, res, next) {
 })
 ```
 
-### File information
+## File information
 
 Each file contains the following informations exposed by `multer-ovh-objectstorage`:
 
