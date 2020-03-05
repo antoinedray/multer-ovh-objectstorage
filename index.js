@@ -21,7 +21,10 @@ function collect(storage, req, file, cb) {
 
 function OVHObjectStorage(opts) {
   switch (typeof opts.version) {
-    case 'number': this.version = opts.version; break
+    case 'number':
+    case 'undefined':
+      this.version = opts.version || 2;
+      break;
     default: throw new TypeError('Expected opts.version to be number')
   }
 
@@ -101,8 +104,7 @@ function connect(opts) {
       method: 'POST',
       uri: opts.authURL + tokenEndpoint,
       json: json,
-      headers: { 'Accept': 'application/json' },
-      encoding: null
+      headers: { 'Accept': 'application/json' }
     }, function(err, res, body) {
       if (err)
         return reject(err);
@@ -111,11 +113,17 @@ function connect(opts) {
       if (!body.access)
         return reject(new Error('Connection response incomplete'));
 
-      const token = body.access.token;
-      const catalog = body.access.serviceCatalog
-                          .find(c => c.type === 'object-store');
-      const endpoint = catalog.endpoints
-                          .find(e => e.region === opts.region);
+      if (otps.version === 3) {
+        const token = res.headers['x-subject-token'];
+        const catalog = body.token.catalog.find(c => c.type === 'object-store');
+        const endpoint = catalog.endpoints.find(e => e.region === opts.region);
+      } else {
+        const token = body.access.token;
+        const catalog = body.access.serviceCatalog
+                            .find(c => c.type === 'object-store');
+        const endpoint = catalog.endpoints
+                            .find(e => e.region === opts.region);
+      }
 
       resolve({ token, endpoint });
     });
@@ -139,7 +147,9 @@ OVHObjectStorage.prototype._handleFile = function(req, file, cb) {
 
     connect(opts).then((res) => {
 
-      const publicURL = res.endpoint.publicURL;
+      const publicURL = (opts.version === 3)
+                          ? res.endpoint.url
+                          : res.endpoint.publicURL;
       const filename = createFilename(file.originalname);
       const params = {
         targetURL: formatTargetURL(publicURL, opts.container, filename),
