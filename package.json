@@ -1,6 +1,6 @@
 {
   "name": "multer-ovh-objectstorage",
-  "version": "1.0.3",
+  "version": "2.0.0",
   "description": "multer storage engine for ovh object storage",
   "main": "index.js",
   "scripts": {
